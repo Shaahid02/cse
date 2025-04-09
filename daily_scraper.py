@@ -34,11 +34,8 @@ try:
     # Parse with pandas using StringIO and lxml
     df = pd.read_html(StringIO(html), flavor="lxml")[0]
 
-    # Generate filename
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    filename = f"{today_str}_daily_share_trading_statistics.csv"
-
-    # Save to CSV
+    # Save to CSV with fixed filename
+    filename = "daily_market_capitalization.csv"
     df.to_csv(filename, index=False)
     print(f"✅ Saved: {filename}")
 
