@@ -16,32 +16,23 @@ payload = {
 try:
     # Make the API request
     response = requests.post(url, json=payload)
+    response.raise_for_status()  # Raise error if request fails
     
-    # Check if the request was successful
-    response.raise_for_status()
+    # Extract the relevant data (assuming response contains "reqByMarketcap")
+    data = response.json().get("reqByMarketcap", [])
     
-    # Parse the JSON response
-    data = response.json()
-    
-    # Convert directly to DataFrame
-    # This will preserve all columns from the API response
+    # Convert to DataFrame
     df = pd.DataFrame(data)
     
-    # Add date column for reference
-    df['date_scraped'] = datetime.now().strftime('%Y-%m-%d')
+    # Add a timestamp column
+    df["date_scraped"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Save to CSV with fixed filename
-    filename = "daily_market_capitalization.csv"
-    df.to_csv(filename, index=False)
-    print(f"✅ Saved: {filename}")
+    # Convert DataFrame to CSV string (comma-separated)
+    csv_string = df.to_csv(index=False)
     
-    # Print column names to verify
-    print("\nColumns in the dataset:")
-    print(df.columns.tolist())
-    
-    # Print first few rows to verify
-    print("\nFirst 3 rows of the data:")
-    print(df.head(3))
+    # Print the CSV string
+    print("CSV Output:")
+    print(csv_string)
 
 except Exception as e:
     print(f"❌ Error: {e}")
