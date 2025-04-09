@@ -1,39 +1,34 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import requests
 import pandas as pd
+import json
 from datetime import datetime
-from io import StringIO
 
-# Set up headless Chrome
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.binary_location = "/usr/bin/chromium-browser"
+# API endpoint
+url = "https://www.cse.lk/api/list_by_market_cap"
 
-# Initialize the driver
-driver = webdriver.Chrome(options=chrome_options)
-
-# Navigate to the page
-url = "https://www.cse.lk/pages/market-capitalization/market-capitalization.html"
-driver.get(url)
+# Payload as specified
+payload = {
+    "headers": {
+        "normalizedNames": {},
+        "lazyUpdate": None
+    }
+}
 
 try:
-    # Wait for the table with ID 'DataTables_Table_0' to load
-    WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.ID, "DataTables_Table_0"))
-    )
-
-    # Extract the table HTML
-    table_element = driver.find_element(By.ID, "DataTables_Table_0")
-    html = table_element.get_attribute("outerHTML")
-
-    # Parse with pandas using StringIO and lxml
-    df = pd.read_html(StringIO(html), flavor="lxml")[0]
-
+    # Make the API request
+    response = requests.post(url, json=payload)
+    
+    # Check if the request was successful
+    response.raise_for_status()
+    
+    # Parse the JSON response
+    data = response.json()
+    
+    # Convert to a pandas DataFrame
+    # Assuming the response has the data in the root level
+    # You might need to adjust this depending on the actual response structure
+    df = pd.DataFrame(data)
+    
     # Save to CSV with fixed filename
     filename = "daily_market_capitalization.csv"
     df.to_csv(filename, index=False)
@@ -42,6 +37,3 @@ try:
 except Exception as e:
     print(f"❌ Error: {e}")
     raise
-
-finally:
-    driver.quit()
