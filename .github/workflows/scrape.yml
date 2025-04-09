@@ -1,0 +1,35 @@
+name: Daily Share Scraper
+
+on:
+  schedule:
+    - cron: "0 12 * * *" # Runs every day at 12:00 UTC
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install selenium pandas
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+          sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+
+      - name: Run scraper
+        run: python daily_scraper.py
+
+      - name: Upload output artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: daily_share_csv
+          path: output/
