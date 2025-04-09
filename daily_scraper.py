@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-import json
 from datetime import datetime
 
 # API endpoint
@@ -24,15 +23,25 @@ try:
     # Parse the JSON response
     data = response.json()
     
-    # Convert to a pandas DataFrame
-    # Assuming the response has the data in the root level
-    # You might need to adjust this depending on the actual response structure
+    # Convert directly to DataFrame
+    # This will preserve all columns from the API response
     df = pd.DataFrame(data)
+    
+    # Add date column for reference
+    df['date_scraped'] = datetime.now().strftime('%Y-%m-%d')
     
     # Save to CSV with fixed filename
     filename = "daily_market_capitalization.csv"
     df.to_csv(filename, index=False)
     print(f"✅ Saved: {filename}")
+    
+    # Print column names to verify
+    print("\nColumns in the dataset:")
+    print(df.columns.tolist())
+    
+    # Print first few rows to verify
+    print("\nFirst 3 rows of the data:")
+    print(df.head(3))
 
 except Exception as e:
     print(f"❌ Error: {e}")
