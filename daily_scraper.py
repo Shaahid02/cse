@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from datetime import datetime
+from io import StringIO
 
 # Set up headless Chrome
 chrome_options = Options()
@@ -30,8 +31,8 @@ try:
     table_element = driver.find_element(By.ID, "DataTables_Table_0")
     html = table_element.get_attribute("outerHTML")
 
-    # Parse with pandas
-    df = pd.read_html(html)[0]
+    # Parse with pandas using StringIO and lxml
+    df = pd.read_html(StringIO(html), flavor="lxml")[0]
 
     # Generate filename
     today_str = datetime.now().strftime("%Y-%m-%d")
