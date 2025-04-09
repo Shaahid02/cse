@@ -27,12 +27,12 @@ try:
     # Add a timestamp column
     df["date_scraped"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Convert DataFrame to CSV string (comma-separated)
-    csv_string = df.to_csv(index=False)
+    # Save to CSV file
+    filename = "daily_market_capitalization.csv"
+    df.to_csv(filename, index=False)
     
-    # Print the CSV string
-    print("CSV Output:")
-    print(csv_string)
+    print(f"✅ Successfully saved to: {filename}")
+    print(f"📊 Total records saved: {len(df)}")
 
 except Exception as e:
     print(f"❌ Error: {e}")
