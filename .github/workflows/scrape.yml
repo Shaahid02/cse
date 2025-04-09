@@ -1,16 +1,13 @@
 name: Daily Share Trading Scraper
-
 on:
   schedule:
-    - cron: "0 12 * * *" # Every day at 12:00 UTC
-  workflow_dispatch: # Allow manual run from GitHub UI
-
+    - cron: "0 10 * * 1-5" # Run at 10:00 UTC, Monday to Friday
+  workflow_dispatch:
 jobs:
-  scrape-and-save:
+  scrape-and-commit:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -20,16 +17,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install selenium pandas
           sudo apt-get update
           sudo apt-get install -y chromium-browser chromium-chromedriver
-          if [ ! -f /usr/bin/chromedriver ]; then sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver; fi
+          pip install -r requirements.txt
+          pip install lxml selenium pandas
 
-      - name: Run scraper script
+      - name: Run scraper
         run: python daily_scraper.py
 
-      - name: Upload CSV as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: daily_share_statistics_csv
-          path: output/
+      - name: Commit and push if changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add daily_market_capitalization.csv
+          git commit -m "Update market capitalization data $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push
