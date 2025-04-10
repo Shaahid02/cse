@@ -28,7 +28,11 @@ try:
     # Convert to DataFrame
     df = pd.DataFrame(data)
     
-    # Add timestamp column in yyyy-MM-dd format
+    # Convert 'lastTradedTime' from timestamp (milliseconds) to datetime
+    if "lastTradedTime" in df.columns:
+        df["lastTradedTime"] = pd.to_datetime(df["lastTradedTime"], unit='ms')  # use 's' if it's in seconds
+
+    # Add 'date_scraped' column in yyyy-MM-dd format
     df["date_scraped"] = datetime.now().strftime("%Y-%m-%d")
     
     # Determine whether to write the header
