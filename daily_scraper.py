@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from datetime import datetime
+import os
 
 # API endpoint
 url = "https://www.cse.lk/api/list_by_market_cap"
@@ -13,26 +14,31 @@ payload = {
     }
 }
 
+# Output CSV file
+filename = "daily_market_capitalization.csv"
+
 try:
     # Make the API request
     response = requests.post(url, json=payload)
-    response.raise_for_status()  # Raise error if request fails
+    response.raise_for_status()
     
-    # Extract the relevant data (assuming response contains "reqByMarketcap")
+    # Extract data
     data = response.json().get("reqByMarketcap", [])
     
     # Convert to DataFrame
     df = pd.DataFrame(data)
     
-    # Add a timestamp column
+    # Add timestamp column
     df["date_scraped"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Save to CSV file
-    filename = "daily_market_capitalization.csv"
-    df.to_csv(filename, index=False)
+    # Determine whether to write the header
+    write_header = not os.path.exists(filename)
     
-    print(f"✅ Successfully saved to: {filename}")
-    print(f"📊 Total records saved: {len(df)}")
+    # Save to CSV (append mode)
+    df.to_csv(filename, mode='a', header=write_header, index=False)
+    
+    print(f"✅ Successfully appended to: {filename}")
+    print(f"📊 Records added: {len(df)}")
 
 except Exception as e:
     print(f"❌ Error: {e}")
