@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 from datetime import datetime
 import os
-import pytz
 
 # API endpoint
 url = "https://www.cse.lk/api/list_by_market_cap"
@@ -29,10 +28,10 @@ try:
     # Convert to DataFrame
     df = pd.DataFrame(data)
     
-    # Convert 'lastTradedTime' from timestamp (milliseconds) to datetime in IST
+    # Convert 'lastTradedTime' and add 5.5 hours
     if "lastTradedTime" in df.columns:
-        df["lastTradedTime"] = pd.to_datetime(df["lastTradedTime"], unit='ms', utc=True)
-        df["lastTradedTime"] = df["lastTradedTime"].dt.tz_convert("Asia/Kolkata")
+        df["lastTradedTime"] = pd.to_datetime(df["lastTradedTime"], unit='ms')
+        df["lastTradedTime"] = df["lastTradedTime"] + pd.Timedelta(hours=5, minutes=30)
         df["lastTradedTime"] = df["lastTradedTime"].dt.strftime("%Y-%m-%d %H:%M:%S")
 
     # Add 'date_scraped' column in yyyy-MM-dd format
