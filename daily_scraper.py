@@ -28,8 +28,8 @@ try:
     # Convert to DataFrame
     df = pd.DataFrame(data)
     
-    # Add timestamp column
-    df["date_scraped"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Add timestamp column in yyyy-MM-dd format
+    df["date_scraped"] = datetime.now().strftime("%Y-%m-%d")
     
     # Determine whether to write the header
     write_header = not os.path.exists(filename)
